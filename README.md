@@ -67,3 +67,24 @@ public class RegisterLoginLogoutController {
     }
 }
 ```
+
+<br>
+
+### @Controller
+이 어노테이션은 이 클래스가 Spring MVC 컨트롤러임을 나타냅니다. <br>
+컨트롤러는 HTTP 요청을 처리하고 적절한 뷰를 반환하거나 데이터를 응답으로 전송하는 역할을 합니다. <br>
+
+### @RequiredArgsConstructor
+이 어노테이션은 Lombok 라이브러리에서 제공하는 것으로, final 필드나 @NonNull이 붙은 필드에 대한 생성자를 자동으로 생성합니다. <br>
+이 클래스에서는 memberService 필드에 대해 생성자를 생성합니다. <br>
+
+### @GetMapping("/login")
+이 메서드는 사용자가 로그인 페이지에 접근할 때 호출됩니다. <br>
+/login URL로 GET 요청이 들어오면 login 뷰를 반환합니다. <br>
+이 뷰는 로그인 페이지를 렌더링합니다. <br>
+
+### @PostMapping("/login")
+이 메서드는 회원가입 요청을 처리합니다. <br>
+/login URL로 POST 요청이 들어오면, 요청 본문에 포함된 MemberRequestDto 객체를 사용하여 회원가입을 처리합니다. <br>
+
+
