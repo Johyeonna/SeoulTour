@@ -19,3 +19,4 @@
 
 ## 회원가입 페이지 Preview
 ![화면 캡처 2024-06-03 114411](https://github.com/Johyeonna/SeoulTour/assets/163944887/2083e750-f1e9-4b3b-b260-ae241ab18142)
+![ezgif com-video-to-apng-converter](https://github.com/Johyeonna/SeoulTour/assets/163944887/8ab8368c-9d72-470e-b214-f4134c0ca74f)
