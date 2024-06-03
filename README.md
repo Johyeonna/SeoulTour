@@ -18,5 +18,52 @@
 <br><br>
 
 ## 회원가입 페이지 Preview
+![s](https://github.com/Johyeonna/SeoulTour/assets/163944887/4af09e3e-3165-46b3-9ba1-62017b9b225d)
 ![화면 캡처 2024-06-03 114411](https://github.com/Johyeonna/SeoulTour/assets/163944887/2083e750-f1e9-4b3b-b260-ae241ab18142)
 ![ezgif com-video-to-apng-converter](https://github.com/Johyeonna/SeoulTour/assets/163944887/8ab8368c-9d72-470e-b214-f4134c0ca74f)
+<br><br>
+
+## 코드 설명
+```java
+@Controller
+@RequiredArgsConstructor
+public class RegisterLoginLogoutController {
+    private final MemberService memberService;
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+    @PostMapping("/login")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> login(@RequestBody MemberRequestDto memberRequestDto) {
+        Member member = new Member();
+        member.setName(memberRequestDto.getName());
+        member.setUserid(memberRequestDto.getUserid());
+        member.setPassword(memberRequestDto.getPassword());
+        member.setEmail(memberRequestDto.getEmail());
+        member.setAuthType(AuthType.USER);
+
+        Map<String, String> response = new HashMap<>();
+        if (memberService.hasUserId(member.getUserid())) {
+            response.put("status", "error");
+            response.put("message", "아이디가 이미 존재합니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } else {
+            Member registerdMember = memberService.createMember(member);
+            if (registerdMember != null) {
+                response.put("status", "success");
+                response.put("message", "가입 성공");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("status", "error");
+                response.put("message", "가입 실패");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            }
+
+
+        }
+    }
+}
+```
