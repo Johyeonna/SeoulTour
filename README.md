@@ -67,7 +67,6 @@ public class RegisterLoginLogoutController {
     }
 }
 ```
-
 <br>
 
 ### @Controller
@@ -86,5 +85,141 @@ public class RegisterLoginLogoutController {
 ### @PostMapping("/login")
 이 메서드는 회원가입 요청을 처리합니다. <br>
 /login URL로 POST 요청이 들어오면, 요청 본문에 포함된 MemberRequestDto 객체를 사용하여 회원가입을 처리합니다. <br>
+
+### 회원 정보 설정
+MemberRequestDto 객체로부터 회원 정보를 가져와 Member 객체에 설정합니다.
+AuthType.USER로 기본 권한 유형을 설정합니다. <br>
+
+### 아이디 중복 확인
+memberService.hasUserId(member.getUserid()) 메서드를 호출하여, 아이디가 이미 존재하는지 확인합니다.
+아이디가 이미 존재하면, 오류 메시지를 포함한 응답을 반환합니다. <br>
+
+### 회원가입 처리
+memberService.createMember(member) 메서드를 호출하여 새로운 회원을 생성합니다. <br>
+회원가입이 성공하면, 성공 메시지를 포함한 응답을 반환합니다. <br>
+회원가입이 실패하면, 실패 메시지를 포함한 응답을 반환합니다. <br><br>
+
+```java
+@Configuration
+//@EnableWebSecurity
+public class SecurityConfig {
+    // 스프링 시큐리티 기능 비 활성화
+    @Bean
+    public WebSecurityCustomizer configure(){
+        return (web -> web.ignoring()
+//                .requestMatchers(new AntPathRequestMatcher("/static/**"))
+                .requestMatchers(new AntPathRequestMatcher("/**"))
+        );
+    }
+//    @Bean
+//    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        return http
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers(
+//                                 new AntPathRequestMatcher("/**")
+////                                new AntPathRequestMatcher("/user/signin"),
+////                                new AntPathRequestMatcher("/user/signup"),
+////                                new AntPathRequestMatcher("/user/logout")
+//                        ).permitAll()
+//                        .anyRequest().authenticated())
+//                .formLogin(formlogin-> formlogin
+//                        .loginPage("/user/signin")
+//                        .defaultSuccessUrl("/board/list")
+//                )
+//                .logout(logout->logout
+//                        .logoutSuccessUrl("/user/signin")
+//                        .invalidateHttpSession(true)
+//                )
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .build();
+//    }
+    // 암호화 관련 Bean등록
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+}
+```
+<br>
+
+### @Configuration
+이 어노테이션은 이 클래스가 Java 기반의 설정 클래스임을 나타냅니다. <br>
+Spring 애플리케이션 컨텍스트에 이 클래스를 로드하여 Bean을 구성할 수 있습니다. <br>
+
+### @Bean
+이 어노테이션은 해당 메서드가 Spring Bean을 생성하고 구성하는 메서드임을 나타냅니다.
+
+### configure()
+이 메서드는 WebSecurityCustomizer 타입의 Bean을 생성합니다. <br>
+이 Bean은 Spring Security의 기능을 비활성화하고 모든 요청에 대해 인증을 무시하도록 설정합니다. <br>
+즉, 모든 요청에 대해 보안을 적용하지 않습니다. <br>
+
+### bCryptPasswordEncoder()
+이 메서드는 BCryptPasswordEncoder를 생성하는 Bean을 등록합니다. <br>
+이것은 암호를 안전하게 저장하고 검증하기 위해 사용됩니다. <br>
+
+### 주석 처리된 코드
+주석 처리된 코드는 Spring Security의 기능을 활성화하고, 특정 URL 패턴에 대한 접근을 제한하고자 할 때 사용됩니다. <br>
+이를 통해 인증, 인가, 로그인 페이지 설정 등 Spring Security의 다양한 기능을 사용할 수 있습니다. <br>
+주석 처리된 코드의 주석을 해제하고 필요한 설정을 추가하여 Spring Security를 구성할 수 있습니다. <br><br>
+
+```java
+@Component
+@RequiredArgsConstructor
+public class MemberDao{
+    private final MemberRepository memberRepository;
+    public Member createMember(Member member){
+        return memberRepository.save(member);
+    }
+    public Member findByUserId(String userid){
+        Optional<Member> findedMember =  memberRepository.findByUserid(userid);
+        if(findedMember.isPresent())
+            return findedMember.get();
+        else
+            return null;
+    }
+}
+```
+<br>
+
+### @Component
+이 어노테이션은 스프링의 구성 요소로서 해당 클래스가 스프링 빈으로 등록되어야 함을 나타냅니다. <br>
+즉, 스프링이 애플리케이션 컨텍스트에서 이 클래스의 인스턴스를 관리합니다. <br>
+
+### createMember(Member member)
+회원을 생성하는 메서드입니다. Member 객체를 전달받아서 memberRepository를 통해 데이터베이스에 저장합니다. <br>
+memberRepository.save(member)를 호출하여 회원 객체를 데이터베이스에 저장하고, 저장된 회원 객체를 반환합니다. <br>
+
+### findByUserId(String userid)
+주어진 아이디에 해당하는 회원을 조회하는 메서드입니다. <br>
+memberRepository.findByUserid(userid)를 호출하여 아이디에 해당하는 회원을 데이터베이스에서 찾습니다. <br>
+Optional을 사용하여 데이터베이스에서 회원을 찾을 수 없는 경우를 처리합니다. <br>
+Optional은 값이 존재하지 않을 수 있는 상황에서 null 대신 사용되며, isPresent() 메서드를 사용하여 값이 존재하는지 확인할 수 있습니다. <br><br>
+
+```java
+@Getter
+@Setter
+@ToString
+public class MemberRequestDto {
+    private Long id;
+    private String name;
+    private String userid;
+    private String password;
+    private String email;
+    private AuthType authType;
+}
+```
+<br>
+
+### @Getter <br>
+Lombok 라이브러리에서 제공하는 어노테이션으로, 모든 필드에 대한 getter 메서드를 자동으로 생성합니다. <br>
+
+### @Setter <br>
+Lombok 라이브러리에서 제공하는 어노테이션으로, 모든 필드에 대한 setter 메서드를 자동으로 생성합니다. <br>
+
+### @ToString <br>
+Lombok 라이브러리에서 제공하는 어노테이션으로, 클래스의 toString() 메서드를 자동으로 생성하여 객체의 내용을 문자열로 표시합니다. <br>
+
+
 
 
